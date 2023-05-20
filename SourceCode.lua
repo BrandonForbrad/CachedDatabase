@@ -1,8 +1,6 @@
 local function ProfileTemplate()
 	return {
-		Recovery = {
-			["Scrap"] = true	
-		},
+		
 		['Scrap'] = 0,
 		['Kills'] = 1,
 		['Deaths'] = 1,
@@ -11,11 +9,14 @@ local function ProfileTemplate()
 	}
 end
 
+
+local ScrapStore = game:GetService("DataStoreService"):GetDataStore("PlayerScrapStore2") --Datastore 
+
+
+
+
+
 local Promise = require(game.ReplicatedStorage.Shared.Promise)
-local ScrapStore = game:GetService("DataStoreService"):GetDataStore("PlayerScrapStore2")
-
-local MainStore = game:GetService("DataStoreService"):GetDataStore("RoamMainDS2")
-
 local CurrentData = {}
 
 
@@ -34,21 +35,7 @@ end
 script.UpdateData.OnInvoke = UpdateData
 script.GetData.OnInvoke = GetData
 
-local function RecoveryCheck(player)
-	if CurrentData[player.UserId].Recovery.Scrap then
-		ScrapStore:UpdateAsync(player.UserId, function(OldData)
-			if OldData ~= nil then 
-				if OldData > 0  then
-					UpdateData(player, "Scrap", function(Old) return Old + OldData  end)
-				end
-			end
 
-			CurrentData[player.UserId].Recovery.Scrap = false
-			return 0
-
-		end)
-	end
-end
 
 
 game.Players.PlayerAdded:Connect(function(player) 
@@ -105,7 +92,6 @@ game.Players.PlayerAdded:Connect(function(player)
 		end):andThen(function() 
 			warn(player.Name, "data has been loaded")
 			SetProfileObjs()
-			RecoveryCheck(player)
 		end):catch(function() 
 			task.spawn(function() 
 				task.wait(2)
