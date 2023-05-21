@@ -85,7 +85,7 @@ game.Players.PlayerAdded:Connect(function(player)
 			MainStore:UpdateAsync(player.UserId, function(Old)
 				if Old == nil then
 					local NewData = {SessonLock = true, Data =  Template}
-					CurrentData[player.UserId] = NewData
+					CurrentData[player.UserId] = NewData.Data
 					return NewData
 				else
 					if Old.SessionLock and Trys < MaxSessionLockTrys then
