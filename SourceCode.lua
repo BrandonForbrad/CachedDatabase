@@ -1,22 +1,18 @@
+local DataStoreID = "MainData"
+
 local function ProfileTemplate()
 	return {
-		
+	
 		['Scrap'] = 0,
 		['Kills'] = 1,
 		['Deaths'] = 1,
 		['Inventory'] = {}
-		
+
 	}
 end
 
-
-local MainStore = game:GetService("DataStoreService"):GetDataStore("MainStore") --Datastore 
-
-
-
-
-
-local Promise = require(game.ReplicatedStorage.Shared.Promise)
+local MainStore = game:GetService("DataStoreService"):GetDataStore(DataStoreID)
+local Promise = require(script.Promise)
 local CurrentData = {}
 
 
@@ -34,7 +30,6 @@ end
 
 script.UpdateData.OnInvoke = UpdateData
 script.GetData.OnInvoke = GetData
-
 
 
 
@@ -60,6 +55,7 @@ game.Players.PlayerAdded:Connect(function(player)
 			MainStore:UpdateAsync(player.UserId, function(Old)
 				if Old == nil then
 					local NewData = {SessonLock = true, Data =  Template}
+					CurrentData[player.UserId] = NewData
 					return NewData
 				else
 					if Old.SessionLock and Trys < 10 then
@@ -91,8 +87,11 @@ game.Players.PlayerAdded:Connect(function(player)
 			resolve()
 		end):andThen(function() 
 			warn(player.Name, "data has been loaded")
+			print(CurrentData[player.UserId])
 			SetProfileObjs()
-		end):catch(function() 
+		
+		end):catch(function(err)
+			print(err)
 			task.spawn(function() 
 				task.wait(2)
 				print("Retrying to load data")
