@@ -1,3 +1,6 @@
+--Created by forbrad | 05/20/2023
+
+
 local DataStoreID = "MainData" -- The name of the datastore that the profiles are saved on
 
 local function ProfileTemplate() --Profile template (Data store entries and default values)
@@ -17,6 +20,24 @@ local function OnDataLoad(player, Data) -- When a player joins and their data is
 end
 
 
+
+
+
+
+
+
+--[[
+	Do not change anything else under here unless you know what you are doing!
+	
+	
+	Notes:
+	This uses promise module: https://eryn.io/roblox-lua-promise/docs/intro
+	If the session lock is active for more then 20 seconds then the session locker will automatically disable 
+]]
+
+local MaxSessionLockTrys = 10
+local SessionLockRetryTime  = 2
+local LoadRetryTime = 2
 
 
 local MainStore = game:GetService("DataStoreService"):GetDataStore(DataStoreID)
@@ -67,9 +88,9 @@ game.Players.PlayerAdded:Connect(function(player)
 					CurrentData[player.UserId] = NewData
 					return NewData
 				else
-					if Old.SessionLock and Trys < 10 then
+					if Old.SessionLock and Trys < MaxSessionLockTrys then
 						task.spawn(function() 
-							task.wait(2)
+							task.wait(SessionLockRetryTime)
 							Trys += 1
 							LoadProfile()
 						end)
@@ -98,7 +119,7 @@ game.Players.PlayerAdded:Connect(function(player)
 			OnDataLoad(player,CurrentData[player.UserId])
 		end):catch(function(err)
 			task.spawn(function() 
-				task.wait(2)
+				task.wait(LoadRetryTime)
 				Trys += 1
 				LoadProfile()
 			end)
