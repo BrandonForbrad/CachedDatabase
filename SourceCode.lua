@@ -10,7 +10,7 @@ local function ProfileTemplate()
 end
 
 
-local ScrapStore = game:GetService("DataStoreService"):GetDataStore("PlayerScrapStore2") --Datastore 
+local MainStore = game:GetService("DataStoreService"):GetDataStore("MainStore") --Datastore 
 
 
 
