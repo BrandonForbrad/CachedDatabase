@@ -1,6 +1,6 @@
-local DataStoreID = "MainData"
+local DataStoreID = "MainData" -- The name of the datastore that the profiles are saved on
 
-local function ProfileTemplate()
+local function ProfileTemplate() --Profile template (Data store entries and default values)
 	return {
 	
 		['Scrap'] = 0,
@@ -10,10 +10,19 @@ local function ProfileTemplate()
 
 	}
 end
+--For items you want to be under the profile folder within the player. You have to add the value in the folder your self.
+
+local function OnDataLoad(player, Data) -- When a player joins and their data is loaded
+	print(player, Data)
+end
+
+
+
 
 local MainStore = game:GetService("DataStoreService"):GetDataStore(DataStoreID)
 local Promise = require(script.Promise)
 local CurrentData = {}
+
 
 
 local function UpdateData(player, DataName, Updater)
@@ -61,7 +70,6 @@ game.Players.PlayerAdded:Connect(function(player)
 					if Old.SessionLock and Trys < 10 then
 						task.spawn(function() 
 							task.wait(2)
-							print("Retrying to load data")
 							Trys += 1
 							LoadProfile()
 						end)
@@ -86,15 +94,11 @@ game.Players.PlayerAdded:Connect(function(player)
 			end)
 			resolve()
 		end):andThen(function() 
-			warn(player.Name, "data has been loaded")
-			print(CurrentData[player.UserId])
 			SetProfileObjs()
-		
+			OnDataLoad(player,CurrentData[player.UserId])
 		end):catch(function(err)
-			print(err)
 			task.spawn(function() 
 				task.wait(2)
-				print("Retrying to load data")
 				Trys += 1
 				LoadProfile()
 			end)
@@ -114,17 +118,13 @@ game.Players.PlayerRemoving:Connect(function(player)
 	local function SaveData()
 		Promise.new(function(resolve)
 			MainStore:UpdateAsync(player.UserId, function(Old)
-				print("data saved")
 				return {SessionLock = false, Data = CurrentData[player.UserId]}
 			end)
 			CurrentData[player.UserId] = nil
-			warn("saved "..player.Name.."'s data")
 			resolve()
 		end):catch(function() 
 			task.spawn(function() 
 				task.wait(1)
-				print("Retrying to save data")
-				
 				SaveData()
 			end)
 		end)
