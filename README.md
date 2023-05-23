@@ -3,3 +3,4 @@ Roblox Cached data base with session locking and automatic change detection. Pro
 
 Download: 
 https://github.com/BrandonForbrad/CachedDatabase/blob/main/DataService.rbxm
+Documentation: https://cacheservice.readme.io/docs/intro
